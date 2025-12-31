@@ -1,0 +1,48 @@
+# .dockerignore for backend
+# Similar to .gitignore but for Docker builds
+# Prevents unnecessary files from being sent to Docker daemon
+
+# Virtual environments (don't copy local venv into container)
+myenv/
+venv/
+env/
+ENV/
+.venv
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# Environment files (secrets should be passed at runtime, not baked in)
+.env
+.env.*
+
+# IDE settings
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Testing
+.coverage
+htmlcov/
+.tox/
+
+# Documentation
+*.md
+README.md
+
+# Git
+.git/
+.gitignore
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+tmp/
+*.log

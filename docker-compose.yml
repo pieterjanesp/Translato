@@ -1,0 +1,110 @@
+# Docker Compose configuration
+# This file defines and orchestrates multiple containers as a single application
+# Run with: docker-compose up
+
+version: '3.8'
+
+services:
+  # ============================================
+  # Backend Service (FastAPI)
+  # ============================================
+  backend:
+    # Build configuration
+    build:
+      context: ./backend          # Where to find Dockerfile
+      dockerfile: Dockerfile       # Dockerfile name (default, can omit)
+
+    # Container name (optional, otherwise auto-generated)
+    container_name: translato-backend
+
+    # Port mapping: host:container
+    # Access backend at http://localhost:8000
+    ports:
+      - "8000:8000"
+
+    # Environment variables
+    # CRITICAL: Secrets injected at runtime, not baked into image
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+
+    # Alternative: Load from .env file
+    # Uncomment this and comment out environment above
+    # env_file:
+    #   - ./backend/.env
+
+    # Volume mounts (optional, for development)
+    # Mount local code into container so changes reflect immediately
+    # Remove this in production - code should be in the image
+    volumes:
+      - ./backend/app:/app/app     # Mount app code
+      - /tmp/document_translator:/tmp/document_translator  # Persist uploaded files
+
+    # Restart policy
+    # "unless-stopped": Always restart unless explicitly stopped
+    # Other options: "no", "always", "on-failure"
+    restart: unless-stopped
+
+    # Health check (optional but recommended)
+    # Docker will mark container as healthy/unhealthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ============================================
+  # Frontend Service (nginx)
+  # ============================================
+  frontend:
+    # Build configuration with build args
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      # Build arguments (optional)
+      # These are available during build, not runtime
+      # args:
+      #   - NODE_ENV=production
+
+    container_name: translato-frontend
+
+    # Port mapping
+    # Access frontend at http://localhost:80 (or just http://localhost)
+    ports:
+      - "5174:80"
+
+    # Depends on backend
+    # This ensures backend starts before frontend
+    # Useful if frontend needs to call backend during startup
+    depends_on:
+      - backend
+
+    restart: unless-stopped
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+# ============================================
+# Networks (optional)
+# ============================================
+# By default, Docker Compose creates a network for all services
+# They can communicate using service names as hostnames
+# Example: frontend can call http://backend:8000
+
+# If you want custom network configuration:
+# networks:
+#   translato-network:
+#     driver: bridge
+
+# ============================================
+# Volumes (optional)
+# ============================================
+# Named volumes for persistent data
+# volumes:
+#   uploaded-files:
+#   translated-files:

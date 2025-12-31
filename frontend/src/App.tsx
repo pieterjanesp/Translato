@@ -5,7 +5,7 @@ import './App.css'
 
 function App() {
   // Get translation state and functions from our custom hook
-  const { job, error, uploading, translating, uploadFile, startTranslation, downloadFile, clearError } = useTranslation()
+  const { job, error, uploading, uploadFile, startTranslation, downloadFile, clearError } = useTranslation()
 
   // Local state for file input and language selection
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
@@ -70,13 +70,6 @@ function App() {
       startTranslation(job.job_id, targetLanguage)
     }
   }, [job, shouldAutoTranslate, targetLanguage, startTranslation])
-
-  // Handle translate button click
-  const handleTranslate = async () => {
-    if (job) {
-      await startTranslation(job.job_id, targetLanguage)
-    }
-  }
 
   // Handle download button click
   const handleDownload = async () => {
