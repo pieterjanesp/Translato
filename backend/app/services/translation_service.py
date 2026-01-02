@@ -13,15 +13,13 @@ load_dotenv()
 anthropic = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
 class TranslationService:
-    def __init__(self): 
+    def __init__(self):
         self.temp_dir = Path("/tmp/document_translator")
         self.temp_dir.mkdir(parents=True, exist_ok=True)
         self.jobs = {}
-        # Initialize Anthropic client
+        # Initialize Anthropic client (optional for testing)
         api_key = os.getenv("ANTHROPIC_API_KEY")
-        if not api_key:
-            raise ValueError("ANTHROPIC_API_KEY is not set")
-        self.anthropic = Anthropic(api_key=api_key)
+        self.anthropic = Anthropic(api_key=api_key) if api_key else None
 
     def create_job(self, filename: str, file_content: bytes) -> Job:
         job_id = str(uuid.uuid4())
@@ -62,6 +60,8 @@ class TranslationService:
 
     def _translate_text(self, text: str, target_language: str) -> str:
         """Translate text using Anthropic"""
+        if not self.anthropic:
+            raise ValueError("ANTHROPIC_API_KEY is not set. Cannot perform translation.")
         try:
             message = self.anthropic.messages.create(
                 model="claude-3-5-haiku-20241022",
