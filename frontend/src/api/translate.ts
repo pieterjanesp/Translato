@@ -1,6 +1,6 @@
 import type { Job } from "../types/job";
 
-const API_URL = "http://localhost:8000/api/translate";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api/translate";
 
 /**
  * 

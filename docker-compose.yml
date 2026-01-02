@@ -63,8 +63,8 @@ services:
       dockerfile: Dockerfile
       # Build arguments (optional)
       # These are available during build, not runtime
-      # args:
-      #   - NODE_ENV=production
+      args:
+        - VITE_API_URL=${VITE_API_URL:-http://localhost:8000/api/translate}
 
     container_name: translato-frontend
 

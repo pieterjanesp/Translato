@@ -25,6 +25,11 @@ RUN npm install
 # This comes after npm install so code changes don't invalidate node_modules
 COPY . .
 
+# Accept build arguments
+ARG VITE_API_URL
+# Make it available to the build proces
+ENV VITE_API_URL=${VITE_API_URL}
+
 # Build the production bundle
 # This runs TypeScript compiler, Vite bundler, creates optimized files
 # Output goes to /app/dist/
