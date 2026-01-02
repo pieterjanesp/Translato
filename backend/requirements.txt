@@ -30,3 +30,5 @@ typing-inspection==0.4.2
 typing_extensions==4.15.0
 uvicorn==0.38.0
 xlsxwriter==3.2.9
+pytest==8.3.4
+httpx==0.28.1  # Already present above, needed for TestClient

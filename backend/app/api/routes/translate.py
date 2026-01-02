@@ -16,6 +16,14 @@ async def upload_document(file: UploadFile = File(...)):
     print(f"[BACKEND] Received upload request for file: {file.filename}")
     print(f"[BACKEND] File content type: {file.content_type}")
 
+    # Validate file type
+    file_ext = Path(file.filename).suffix.lower()
+    if file_ext not in settings.allowed_file_extensions:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid file type: {file_ext}. Allowed types: {', '.join(settings.allowed_file_extensions)}"
+        )
+
     file_content = await file.read()
     print(f"[BACKEND] File size: {len(file_content)} bytes")
 
