@@ -1,0 +1,59 @@
+# Production Docker Compose Configuration
+# Uses pre-built images from GitHub Container Registry
+# Run with: docker-compose -f docker-compose.prod.yml up -d
+
+services:
+  # ============================================
+  # Backend Service (FastAPI)
+  # ============================================
+  backend:
+    # Use pre-built image instead of building
+    image: ghcr.io/pieterjanesp/translato-backend:latest
+
+    container_name: translato-backend
+
+    ports:
+      - "8000:8000"
+
+    # Environment variables
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+
+    # Volume mounts for persistent data
+    volumes:
+      - /tmp/document_translator:/tmp/document_translator
+
+    restart: unless-stopped
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ============================================
+  # Frontend Service (nginx)
+  # ============================================
+  frontend:
+    # Use pre-built image with baked-in API URL
+    image: ghcr.io/pieterjanesp/translato-frontend:latest
+
+    container_name: translato-frontend
+
+    ports:
+      - "5175:80"
+
+    depends_on:
+      - backend
+
+    restart: unless-stopped
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
