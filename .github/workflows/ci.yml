@@ -1,0 +1,70 @@
+# CI/CD Pipeline for Document Translator
+# This workflow runs automatically on every push and pull request
+
+name: CI Pipeline
+
+# When to run this workflow
+on:
+  push:
+    branches: [ main, develop ]  # Run on pushes to main or develop
+  pull_request:
+    branches: [ main ]  # Run on PRs targeting main
+
+# Jobs to run (can run in parallel)
+jobs:
+  # ============================================
+  # Job 1: Test Backend
+  # ============================================
+  test-backend:
+    runs-on: ubuntu-latest  # Use GitHub's Ubuntu VM
+
+    steps:
+      # Step 1: Get the code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Python
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        working-directory: ./backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # Step 4: Run tests
+      - name: Run pytest
+        working-directory: ./backend
+        run: |
+          python -m pytest tests/ -v
+
+  # ============================================
+  # Job 2: Test Frontend
+  # ============================================
+  test-frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Get the code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm install
+
+      # Step 4: Run TypeScript type check
+      - name: Type check
+        working-directory: ./frontend
+        run: npm run build
