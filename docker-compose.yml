@@ -71,7 +71,7 @@ services:
     # Port mapping
     # Access frontend at http://localhost:80 (or just http://localhost)
     ports:
-      - "5174:80"
+      - "5175:80"
 
     # Depends on backend
     # This ensures backend starts before frontend
